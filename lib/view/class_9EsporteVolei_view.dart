@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:friendly_sports/controller/class_QuadrasVoleiController.dart';
+import 'package:friendly_sports/controller/class_Quadras_controller.dart';
 import 'package:friendly_sports/view/class_QuadrasDetalhes_view.dart';
 
 class VoleibolView extends StatelessWidget {
-  final QuadrasVoleibolController controller = QuadrasVoleibolController();
+  final QuadrasController controller = QuadrasController();
 
   @override
   Widget build(BuildContext context) {
