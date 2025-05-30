@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:friendly_sports/view/class_Quadras_view.dart';
-
 class QuadrasModel {
   final String nome;
   final String end;
