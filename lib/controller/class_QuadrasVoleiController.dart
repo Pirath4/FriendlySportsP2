@@ -6,14 +6,14 @@ class QuadrasVoleibolModel {
   final String nome;
   final String end;
   final String qtdquadras;
-  final Widget pagina;
-  final String imagemUrl;
+  //final Widget pagina;
+  final List<String> imagemUrl;
 
   QuadrasVoleibolModel({
     required this.nome,
     required this.end,
     required this.qtdquadras,
-    required this.pagina,
+    //required this.pagina,
     required this.imagemUrl,
   });
 }
@@ -21,13 +21,14 @@ class QuadrasVoleibolModel {
 class QuadrasVoleibolController extends ChangeNotifier {
   final List<QuadrasVoleibolModel> _quadrasvoleibol = [
     QuadrasVoleibolModel(
-      nome: 'Invictus RP',
-      end: 'Av. Itatiaia, 100 - Jardim Sumare, Ribeirão Preto - SP, 14025-240',
-      qtdquadras: '2 quadras',
-      pagina: QuadrasView(),
-      imagemUrl:
+        nome: 'Invictus RP',
+        end:
+            'Av. Itatiaia, 100 - Jardim Sumare, Ribeirão Preto - SP, 14025-240',
+        qtdquadras: '2 quadras',
+        //pagina: QuadrasView(),
+        imagemUrl: [
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC2zQqTwlxbltqjhh9MhovXXkb6xhUISkdRqVboe6LiSOle0RoHIYJa3NmyEUXccoTZ7I&usqp=CAU',
-    ),
+        ]),
   ];
 
   bool _visualizarLista = true;

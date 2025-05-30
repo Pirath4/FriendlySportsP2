@@ -1,10 +1,11 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 class QuadraDetalhesView extends StatelessWidget {
   final String nome;
   final String endereco;
   final String qtdQuadras;
-  final String imagemUrl;
+  final List<String> imagemUrl;
 
   const QuadraDetalhesView({
     required this.nome,
@@ -13,6 +14,8 @@ class QuadraDetalhesView extends StatelessWidget {
     required this.imagemUrl,
     Key? key,
   }) : super(key: key);
+
+  static const users = [ "1","s"];
 
   @override
   Widget build(BuildContext context) {
@@ -28,20 +31,77 @@ class QuadraDetalhesView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Imagem no topo
-            Image.network(
-              imagemUrl,
-              width: double.infinity,
-              height: 250,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  height: 250,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.error, size: 50), // Ícone de erro
+            CarouselSlider(
+              options: CarouselOptions(
+                height: 250,
+                viewportFraction: 1.0,
+                enableInfiniteScroll: false,
+                scrollDirection: Axis.horizontal, // ou Axis.vertical
+              ),
+              items: imagemUrl.map((url) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Image.network(
+                      url,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 250,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error, size: 50),
+                        );
+                      },
+                    );
+                  },
                 );
-              },
+              }).toList(),
             ),
+
+            //Lista de botoes de avatares
+            SizedBox(
+              height: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  final usuario = users[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundImage: NetworkImage(usuario),
+                          backgroundColor: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          usuario,
+                          style: const TextStyle(fontSize: 12),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Imagem no topo
+            // Image.network(
+            //   imagemUrl,
+            //   width: double.infinity,
+            //   height: 250,
+            //   fit: BoxFit.cover,
+            //   errorBuilder: (context, error, stackTrace) {
+            //     return Container(
+            //       height: 250,
+            //       color: Colors.grey[300],
+            //       child: const Icon(Icons.error, size: 50), // Ícone de erro
+            //     );
+            //   },
+            // ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(

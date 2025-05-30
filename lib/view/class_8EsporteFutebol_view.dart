@@ -74,7 +74,7 @@ class FutebolView extends StatelessWidget {
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(12.0)),
                       child: Image.network(
-                        item.imagemUrl,
+                        item.imagemUrl[0],
                         width: double.infinity,
                         height: 200,
                         fit: BoxFit.cover,
