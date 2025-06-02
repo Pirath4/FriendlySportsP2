@@ -7,7 +7,6 @@ class QuadrasModel {
   // final Widget pagina;
   final List<String> imagemUrl;
   final String esporte;
-  final String telefone;
 
   QuadrasModel({
     required this.nome,
@@ -16,7 +15,6 @@ class QuadrasModel {
     // required this.pagina,
     required this.imagemUrl,
     required this.esporte,
-    required this.telefone,
   });
 }
 
@@ -30,8 +28,7 @@ class QuadrasController extends ChangeNotifier {
           'https://assets.goal.com/images/v3/blt55456c6aa445f207/1bb5dc6e3a3c4a9a803b03848f20eb4a7b36df0b.jpg?auto=webp&format=pjpg&width=3840&quality=60',
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC2zQqTwlxbltqjhh9MhovXXkb6xhUISkdRqVboe6LiSOle0RoHIYJa3NmyEUXccoTZ7I&usqp=CAU',
         ],
-        esporte: "Futebol e Voleibol",
-        telefone: "16 997286137"),
+        esporte: "Futebol e Voleibol"),
     QuadrasModel(
         nome: 'Quadra de esportes Xavier',
         end: 'Av. Patriarca, 2686 - Jardim Bela Vista, Ribeirão Preto - SP',
@@ -39,8 +36,7 @@ class QuadrasController extends ChangeNotifier {
         imagemUrl: [
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC2zQqTwlxbltqjhh9MhovXXkb6xhUISkdRqVboe6LiSOle0RoHIYJa3NmyEUXccoTZ7I&usqp=CAU',
         ],
-        esporte: "Futebol",
-        telefone: "16 997286138"),
+        esporte: "Futebol"),
     QuadrasModel(
         nome: 'Invictus RP',
         end:
@@ -50,8 +46,7 @@ class QuadrasController extends ChangeNotifier {
         imagemUrl: [
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC2zQqTwlxbltqjhh9MhovXXkb6xhUISkdRqVboe6LiSOle0RoHIYJa3NmyEUXccoTZ7I&usqp=CAU',
         ],
-        esporte: "Voleibol",
-        telefone: "16 997286138"),
+        esporte: "Voleibol"),
   ];
 
   bool _visualizarLista = true;
