@@ -8,6 +8,11 @@ class FutebolView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Filtra as quadras para exibir só as que possuem "futebol" no esporte
+    final quadrasFutebol = controller.quadras
+        .where((q) => q.esporte.toLowerCase().contains('futebol'))
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -36,26 +41,24 @@ class FutebolView extends StatelessWidget {
           ],
         ),
       ),
-
-      // Cor do fundo
       backgroundColor: Colors.blue[50],
-
       body: ListView.builder(
-        itemCount: controller.quadras.length,
+        itemCount: quadrasFutebol.length,
         itemBuilder: (context, index) {
-          final item = controller.quadras[index];
+          final item = quadrasFutebol[index];
 
           return GestureDetector(
             onTap: () {
-              // Navega para a view da quadra
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => QuadraDetalhesView(
-                        nome: item.nome,
-                        endereco: item.end,
-                        qtdQuadras: item.qtdquadras,
-                        imagemUrl: item.imagemUrl)),
+                  builder: (context) => QuadraDetalhesView(
+                    nome: item.nome,
+                    endereco: item.end,
+                    qtdQuadras: item.qtdquadras,
+                    imagemUrl: item.imagemUrl,
+                  ),
+                ),
               );
             },
             child: Padding(
@@ -69,7 +72,6 @@ class FutebolView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Imagem grande
                     ClipRRect(
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(12.0)),
@@ -87,8 +89,6 @@ class FutebolView extends StatelessWidget {
                         },
                       ),
                     ),
-
-                    // Texto embaixo da imagem
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(

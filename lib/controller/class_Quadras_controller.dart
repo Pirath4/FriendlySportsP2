@@ -46,7 +46,7 @@ class QuadrasController extends ChangeNotifier {
         imagemUrl: [
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC2zQqTwlxbltqjhh9MhovXXkb6xhUISkdRqVboe6LiSOle0RoHIYJa3NmyEUXccoTZ7I&usqp=CAU',
         ],
-        esporte: "Voleibol"),
+        esporte: "Futebol e Voleibol"),
   ];
 
   bool _visualizarLista = true;
