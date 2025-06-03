@@ -1,14 +1,22 @@
+// ignore_for_file: prefer_const_constructors
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 
+import 'firebase_options.dart';
 import 'package:friendly_sports/view/class_1Login_view.dart';
 import 'package:friendly_sports/view/class_5Perfil_view.dart';
 import 'package:friendly_sports/view/class_6Config_view.dart';
 import 'package:friendly_sports/view/class_7Esportes_view.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // necessário para operações async antes do runApp
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
-    //Carregar o plugin device preview
     DevicePreview(
       enabled: true,
       builder: (context) => MainApp(),
@@ -23,7 +31,11 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'navegacao',
+      title: 'Friendly Sports',
+      useInheritedMediaQuery:
+          true, // necessário para funcionar com DevicePreview
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
       initialRoute: 'home',
       routes: {
         'home': (context) => LoginView(),
