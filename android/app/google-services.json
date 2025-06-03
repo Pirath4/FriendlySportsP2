@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "223310027624",
+    "project_id": "friendlysportsp2",
+    "storage_bucket": "friendlysportsp2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223310027624:android:d4a274d55c6a742be494dd",
+        "android_client_info": {
+          "package_name": "com.example.friendly_sports"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdsJSQ91CQSzFRogRiplW3hQrRBGYUmj8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
