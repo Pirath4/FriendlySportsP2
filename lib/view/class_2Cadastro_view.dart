@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:friendly_sports/models/class_Cadastro_model.dart';
+import 'package:friendly_sports/controller/class_Login_controller.dart';
 
 class CadastroView extends StatefulWidget {
   @override
@@ -8,7 +8,7 @@ class CadastroView extends StatefulWidget {
 }
 
 class _CadastroViewState extends State<CadastroView> {
-  final CadastroModel viewModel = CadastroModel();
+  final CadastroController viewModel = CadastroController();
 
   @override
   Widget build(BuildContext context) {
@@ -122,10 +122,10 @@ class _CadastroViewState extends State<CadastroView> {
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {
-                      String message = viewModel.fazerCadastro();
+                    onPressed: () async {
+                      String message = await viewModel.fazerCadastro();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(message)),
+                        SnackBar(content: Text(message as String)),
                       );
                     },
                     style: ElevatedButton.styleFrom(

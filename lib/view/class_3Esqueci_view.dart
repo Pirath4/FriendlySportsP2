@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:friendly_sports/models/class_Esqueci_model.dart';
+import 'package:friendly_sports/controller/class_Login_controller.dart';
 
 class EsqueciView extends StatefulWidget {
   @override
@@ -8,7 +8,7 @@ class EsqueciView extends StatefulWidget {
 }
 
 class _EsqueciViewState extends State<EsqueciView> {
-  final EsqueciModel viewModel = EsqueciModel();
+  final EsqueciController viewModel = EsqueciController();
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:friendly_sports/models/class_Login_model.dart';
+import 'package:friendly_sports/controller/class_Login_controller.dart';
+
 import 'package:friendly_sports/view/class_2Cadastro_View.dart';
 import 'package:friendly_sports/view/class_3Esqueci_view.dart';
 import 'package:friendly_sports/view/class_4SobreNos_view.dart';
@@ -12,7 +13,7 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final LoginModel viewModel = LoginModel();
+  final LoginController viewModel = LoginController();
 
   @override
   Widget build(BuildContext context) {
