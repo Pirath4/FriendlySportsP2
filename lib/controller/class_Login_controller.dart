@@ -7,16 +7,18 @@ class LoginController {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
 
-  bool fazerLogin() {
-    String email = emailController.text;
-    String senha = senhaController.text;
+  Future<String> fazerLogin() async {
+    String email = emailController.text.trim();
+    String senha = senhaController.text.trim();
 
-    final FirebaseAuth auth = FirebaseAuth.instance;
-
-    if (email == "1" && senha == "2") {
-      return true;
-    } else {
-      return false;
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: senha,
+      );
+      return "sucesso";
+    } on FirebaseAuthException catch (e) {
+      return "Erro ao fazer login: ${e.message}";
     }
   }
 }

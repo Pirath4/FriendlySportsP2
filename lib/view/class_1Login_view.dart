@@ -176,10 +176,10 @@ class _LoginViewState extends State<LoginView> {
                         margin: EdgeInsets.only(
                             right: 5), // Espaçamento entre os botões
                         child: ElevatedButton(
-                          onPressed: () {
-                            bool resultado = viewModel.fazerLogin();
+                          onPressed: () async {
+                            String resultado = await viewModel.fazerLogin();
                             String message;
-                            if (resultado) {
+                            if (resultado == "sucesso") {
                               message = "Login realizado com sucesso!";
                               Navigator.push(
                                 context,
