@@ -62,7 +62,7 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
     try {
       // Verificar se já existe uma reserva para o mesmo horário
       final existingReservation = await FirebaseFirestore.instance
-          .collection('quadra')
+          .collection('reserva')
           .where('Quadra', isEqualTo: widget.nome)
           .where('Data', isEqualTo: data)
           .where('Hora', isEqualTo: hora)
@@ -98,7 +98,7 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
       final userName = userData['nome'] ?? 'Usuário Desconhecido';
 
       // Salvar a reserva no Firestore
-      await FirebaseFirestore.instance.collection('quadra').add({
+      await FirebaseFirestore.instance.collection('reserva').add({
         'nome': userName,
         'Quadra': widget.nome,
         'Data': data,
@@ -280,7 +280,7 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                       Center(
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.check),
-                          label: const Text("Confirmar Reserva"),
+                          label: const Text("Confirmar Reser"),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
                             padding: const EdgeInsets.symmetric(
