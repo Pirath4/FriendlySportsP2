@@ -24,20 +24,37 @@ class LoginController {
 }
 
 class EsqueciController {
-  final TextEditingController nomeController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController senhaController = TextEditingController();
 
-  String esqueciCadastro() {
-    String nome = nomeController.text;
-    String email = emailController.text;
+  Future<String> esqueciCadastro() async {
+    String email = emailController.text.trim();
 
-    // Lógica de cadastro
-    if (nome.isNotEmpty && email.isNotEmpty) {
-      return "Codigo enviado ao email!";
-    } else {
-      return "Preencha todos os campos!";
+    // Verifica se o campo de e-mail está preenchido
+    if (email.isEmpty) {
+      return "Preencha o campo de e-mail!";
     }
+
+    try {
+      // Envia o e-mail de redefinição de senha usando o Firebase
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      return "Código enviado ao e-mail!";
+    } on FirebaseAuthException catch (e) {
+      // Tratamento de erros do Firebase
+      if (e.code == 'user-not-found') {
+        return "Nenhum usuário encontrado com este e-mail.";
+      } else if (e.code == 'invalid-email') {
+        return "E-mail inválido. Verifique o formato do e-mail.";
+      } else {
+        return "Erro ao enviar o e-mail de recuperação: ${e.message}";
+      }
+    } catch (e) {
+      return "Ocorreu um erro inesperado: $e";
+    }
+  }
+
+  // Limpa o campo após o uso
+  void dispose() {
+    emailController.dispose();
   }
 }
 
@@ -47,6 +64,8 @@ class CadastroController {
   final TextEditingController senhaController = TextEditingController();
   final TextEditingController nascimentoController = TextEditingController();
   final TextEditingController telefoneController = TextEditingController();
+
+  get confirmarSenhaController => null;
 
   Future<String> fazerCadastro() async {
     String nome = nomeController.text.trim();
@@ -85,4 +104,6 @@ class CadastroController {
       return "Erro no cadastro: ${e}";
     }
   }
+
+  void dispose() {}
 }
