@@ -1,5 +1,6 @@
-// ... suas imports permanecem as mesmas
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -18,8 +19,6 @@ class QuadraDetalhesView extends StatefulWidget {
     required this.imagemUrl,
     Key? key,
   }) : super(key: key);
-
-  static const users = ["1", "s"];
 
   @override
   _QuadraDetalhesViewState createState() => _QuadraDetalhesViewState();
@@ -43,19 +42,87 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
     Intl.defaultLocale = 'pt_BR';
   }
 
-  void _confirmarReserva() {
+  Future<void> _confirmarReserva() async {
     final data = DateFormat('dd/MM/yyyy').format(_selectedDay!);
     final hora = _horarioSelecionado!;
-    final mensagem = 'Reserva confirmada para $data às $hora';
+    final user = FirebaseAuth.instance.currentUser;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        duration: Duration(seconds: 3),
-      ),
-    );
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Usuário não está logado!'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
 
-    print(mensagem);
+    try {
+      // Verificar se já existe uma reserva para o mesmo horário
+      final existingReservation = await FirebaseFirestore.instance
+          .collection('quadra')
+          .where('Quadra', isEqualTo: widget.nome)
+          .where('Data', isEqualTo: data)
+          .where('Hora', isEqualTo: hora)
+          .get();
+
+      if (existingReservation.docs.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Este horário já está reservado!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+
+      // Buscar o nome do usuário no Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Dados do usuário não encontrados!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+
+      final userData = userDoc.data() as Map<String, dynamic>;
+      final userName = userData['nome'] ?? 'Usuário Desconhecido';
+
+      // Salvar a reserva no Firestore
+      await FirebaseFirestore.instance.collection('quadra').add({
+        'nome': userName,
+        'Quadra': widget.nome,
+        'Data': data,
+        'Hora': hora,
+        'Criado em': FieldValue.serverTimestamp(),
+      });
+
+      final mensagem = 'Reserva confirmada para $data às $hora';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+
+      print(mensagem);
+    } catch (e) {
+      final errorMessage = 'Erro ao salvar reserva: $e';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      print(errorMessage);
+    }
   }
 
   @override
@@ -99,32 +166,59 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
             ),
             SizedBox(
               height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: QuadraDetalhesView.users.length,
-                itemBuilder: (context, index) {
-                  final usuario = QuadraDetalhesView.users[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundImage: NetworkImage(usuario),
-                          onBackgroundImageError: (exception, stackTrace) {
-                            print('Erro ao carregar imagem: $exception');
-                          },
-                          backgroundColor: Colors.grey[300],
-                          child: usuario.isEmpty ? Icon(Icons.person) : null,
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('quadra')
+                    .where('Quadra', isEqualTo: widget.nome)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return const Text('Erro ao carregar usuários');
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(
+                        child: Text('Nenhum usuário reservou esta quadra.'));
+                  }
+
+                  // Obter lista única de nomes de usuários
+                  final userNames = snapshot.data!.docs
+                      .map(
+                          (doc) => (doc.data() as Map<String, dynamic>)['nome'])
+                      .toSet()
+                      .toList();
+
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: userNames.length,
+                    itemBuilder: (context, index) {
+                      final usuario = userNames[index] ?? 'Desconhecido';
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Column(
+                          children: [
+                            const CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.grey,
+                              child: Icon(Icons.person, color: Colors.white),
+                            ),
+                            const SizedBox(height: 5),
+                            SizedBox(
+                              width: 60,
+                              child: Text(
+                                usuario,
+                                style: const TextStyle(fontSize: 12),
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 5),
-                        Text(
-                          usuario,
-                          style: const TextStyle(fontSize: 12),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               ),
@@ -134,8 +228,8 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Agende um horário:",
+                  const Text(
+                    'Agende um horário:',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
@@ -156,9 +250,7 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                       }
                     },
                     onFormatChanged: (format) {
-                      setState(() {
-                        _calendarFormat = format;
-                      });
+                      setState(() => _calendarFormat = format);
                     },
                     onPageChanged: (focusedDay) {
                       _focusedDay = focusedDay;
@@ -168,20 +260,20 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                         color: Colors.blueAccent.withOpacity(0.5),
                         shape: BoxShape.circle,
                       ),
-                      selectedDecoration: BoxDecoration(
+                      selectedDecoration: const BoxDecoration(
                         color: Colors.blue,
                         shape: BoxShape.circle,
                       ),
                     ),
-                    headerStyle: HeaderStyle(
+                    headerStyle: const HeaderStyle(
                       formatButtonVisible: true,
                       titleCentered: true,
                     ),
                   ),
                   const SizedBox(height: 20),
                   if (_selectedDay != null) ...[
-                    Text(
-                      "Selecione um horário:",
+                    const Text(
+                      'Selecione um horário:',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -209,8 +301,8 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                     if (_horarioSelecionado != null)
                       Center(
                         child: ElevatedButton.icon(
-                          icon: Icon(Icons.check),
-                          label: Text("Confirmar Reserva"),
+                          icon: const Icon(Icons.check),
+                          label: const Text('Confirmar Reserva'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
                             padding: const EdgeInsets.symmetric(
@@ -221,6 +313,58 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                           onPressed: _confirmarReserva,
                         ),
                       ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Reservas Confirmadas:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('quadra')
+                          .where('Quadra', isEqualTo: widget.nome)
+                          .orderBy('Criado em', descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasError) {
+                          return const Text('Erro ao carregar reservas');
+                        }
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Text(
+                              'Nenhuma reserva encontrada para esta quadra.');
+                        }
+
+                        // Obter lista única de nomes de usuários
+                        final userNames = snapshot.data!.docs
+                            .map((doc) =>
+                                (doc.data() as Map<String, dynamic>)['nome'] ??
+                                'Desconhecido')
+                            .toSet()
+                            .toList();
+
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: userNames.length,
+                          itemBuilder: (context, index) {
+                            final userName = userNames[index];
+                            return ListTile(
+                              leading:
+                                  const Icon(Icons.person, color: Colors.blue),
+                              title: Text(userName),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ],
               ),

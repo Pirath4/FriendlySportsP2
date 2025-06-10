@@ -95,7 +95,7 @@ class CadastroController {
         'telefone': telefone,
         'nascimento': nascimento,
         'email': email,
-        'criado_em': FieldValue.serverTimestamp(),
+        'criado em': FieldValue.serverTimestamp(),
       });
 
       return "Cadastro realizado com sucesso!";
