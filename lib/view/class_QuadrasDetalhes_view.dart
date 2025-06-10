@@ -20,6 +20,8 @@ class QuadraDetalhesView extends StatefulWidget {
     Key? key,
   }) : super(key: key);
 
+  static const users = ["1", "2"];
+
   @override
   _QuadraDetalhesViewState createState() => _QuadraDetalhesViewState();
 }
@@ -166,59 +168,33 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
             ),
             SizedBox(
               height: 100,
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('quadra')
-                    .where('Quadra', isEqualTo: widget.nome)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return const Text('Erro ao carregar usuários');
-                  }
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(
-                        child: Text('Nenhum usuário reservou esta quadra.'));
-                  }
-
-                  // Obter lista única de nomes de usuários
-                  final userNames = snapshot.data!.docs
-                      .map(
-                          (doc) => (doc.data() as Map<String, dynamic>)['nome'])
-                      .toSet()
-                      .toList();
-
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: userNames.length,
-                    itemBuilder: (context, index) {
-                      final usuario = userNames[index] ?? 'Desconhecido';
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Column(
-                          children: [
-                            const CircleAvatar(
-                              radius: 30,
-                              backgroundColor: Colors.grey,
-                              child: Icon(Icons.person, color: Colors.white),
-                            ),
-                            const SizedBox(height: 5),
-                            SizedBox(
-                              width: 60,
-                              child: Text(
-                                usuario,
-                                style: const TextStyle(fontSize: 12),
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                              ),
-                            ),
-                          ],
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: QuadraDetalhesView.users.length,
+                itemBuilder: (context, index) {
+                  final usuario = QuadraDetalhesView.users[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundImage: NetworkImage(usuario),
+                          onBackgroundImageError: (exception, stackTrace) {
+                            print('Erro ao carregar imagem: $exception');
+                          },
+                          backgroundColor: Colors.grey[300],
+                          child:
+                              usuario.isEmpty ? const Icon(Icons.person) : null,
                         ),
-                      );
-                    },
+                        const SizedBox(height: 5),
+                        Text(
+                          usuario,
+                          style: const TextStyle(fontSize: 12),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
@@ -229,7 +205,7 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Agende um horário:',
+                    "Agende um horário:",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
@@ -250,7 +226,9 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                       }
                     },
                     onFormatChanged: (format) {
-                      setState(() => _calendarFormat = format);
+                      setState(() {
+                        _calendarFormat = format;
+                      });
                     },
                     onPageChanged: (focusedDay) {
                       _focusedDay = focusedDay;
@@ -273,7 +251,7 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                   const SizedBox(height: 20),
                   if (_selectedDay != null) ...[
                     const Text(
-                      'Selecione um horário:',
+                      "Selecione um horário:",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -302,7 +280,7 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                       Center(
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.check),
-                          label: const Text('Confirmar Reserva'),
+                          label: const Text("Confirmar Reserva"),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
                             padding: const EdgeInsets.symmetric(
@@ -314,8 +292,9 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                         ),
                       ),
                     const SizedBox(height: 20),
+                    // Widget para mostrar as reservas existentes
                     const Text(
-                      'Reservas Confirmadas:',
+                      "Reservas Confirmadas:",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -342,24 +321,24 @@ class _QuadraDetalhesViewState extends State<QuadraDetalhesView> {
                               'Nenhuma reserva encontrada para esta quadra.');
                         }
 
-                        // Obter lista única de nomes de usuários
-                        final userNames = snapshot.data!.docs
-                            .map((doc) =>
-                                (doc.data() as Map<String, dynamic>)['nome'] ??
-                                'Desconhecido')
-                            .toSet()
-                            .toList();
+                        final reservas = snapshot.data!.docs;
 
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: userNames.length,
+                          itemCount: reservas.length,
                           itemBuilder: (context, index) {
-                            final userName = userNames[index];
+                            final reserva =
+                                reservas[index].data() as Map<String, dynamic>;
+                            final userName = reserva['nome'] ?? 'Desconhecido';
+                            final data = reserva['Data'] ?? 'N/A';
+                            final hora = reserva['Hora'] ?? 'N/A';
+
                             return ListTile(
                               leading:
-                                  const Icon(Icons.person, color: Colors.blue),
-                              title: Text(userName),
+                                  const Icon(Icons.event, color: Colors.blue),
+                              title: Text('Usuário: $userName'),
+                              subtitle: Text('Data: $data, Hora: $hora'),
                             );
                           },
                         );

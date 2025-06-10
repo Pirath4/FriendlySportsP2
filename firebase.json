@@ -1,1 +1,37 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"friendlysportsp2","appId":"1:223310027624:android:d4a274d55c6a742be494dd","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"friendlysportsp2","configurations":{"android":"1:223310027624:android:d4a274d55c6a742be494dd","ios":"1:223310027624:ios:2991ca6d66f62b12e494dd","web":"1:223310027624:web:c9ad5030d496698ae494dd"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "friendlysportsp2",
+          "appId": "1:223310027624:android:d4a274d55c6a742be494dd",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "friendlysportsp2",
+          "configurations": {
+            "android": "1:223310027624:android:d4a274d55c6a742be494dd",
+            "ios": "1:223310027624:ios:2991ca6d66f62b12e494dd",
+            "web": "1:223310027624:web:c9ad5030d496698ae494dd"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
